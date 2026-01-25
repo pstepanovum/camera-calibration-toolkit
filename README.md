@@ -5,7 +5,7 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A comprehensive toolkit for camera intrinsic calibration implementing both automated and manual calibration methodologies. Developed as part of ECE 738 Computer Vision coursework at the University of Wisconsin-Madison, Spring 2026.
+A comprehensive toolkit for camera intrinsic calibration implementing both automated and manual calibration methodologies. Developed as part of ECE 738 Computer Vision coursework at the University of Miami, Spring 2026.
 
 ## Overview
 
@@ -158,5 +158,5 @@ For questions or discussions regarding this project, please open an issue on Git
 ## Acknowledgments
 
 - Course: ECE 738 Computer Vision
-- Institution: University of Wisconsin-Madison
+- Institution: University of Miami
 - Semester: Spring 2026
