@@ -15,6 +15,7 @@ import sys
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 from config import CheckerboardConfig, CalibrationConfig, PathConfig
+from utils.visualization import generate_all_visualizations
 
 
 class CameraCalibrator:
@@ -361,6 +362,9 @@ def main():
     
     # Step 4: Save results
     calibrator.save_calibration(results_dir)
+    
+    # Step 5: Generate visualizations
+    generate_all_visualizations(calibrator, results_dir)
     
     print("\n" + "=" * 70)
     print("CALIBRATION COMPLETE")

@@ -30,7 +30,10 @@ This project implements two complementary approaches to camera calibration:
 camera-calibration-toolkit/
 ├── src/
 │   ├── automated/          # Automated calibration implementation
+│   │   └── calibrate.py
 │   ├── manual/             # Manual calibration experiments
+│   │   ├── aspect_ratio.py
+│   │   └── focal_length.py
 │   └── utils/              # Shared utilities and visualization tools
 ├── data/
 │   ├── checkerboard_images/    # Input images for automated calibration
@@ -79,6 +82,7 @@ pip install -r requirements.txt
 Place checkerboard images in `data/checkerboard_images/` and run:
 
 ```bash
+python src/automated/calibrate.py
 python src/automated/calibrate.py --input data/checkerboard_images/ --output results/
 ```
 
