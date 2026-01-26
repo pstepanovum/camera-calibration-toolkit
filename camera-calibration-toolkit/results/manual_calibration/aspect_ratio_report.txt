@@ -1,0 +1,29 @@
+MANUAL CALIBRATION: ASPECT RATIO ESTIMATION
+======================================================================
+
+METHOD
+----------------------------------------------------------------------
+Manual measurement of a known square object
+Image: square_image.png
+Physical square size: 105.0 mm
+
+MEASUREMENTS
+----------------------------------------------------------------------
+Horizontal length: 679.06 pixels
+Vertical length: 666.15 pixels
+Scale horizontal: 6.4673 pixels/mm
+Scale vertical: 6.3443 pixels/mm
+
+RESULTS
+----------------------------------------------------------------------
+Aspect Ratio (fx/fy): 1.019388
+Deviation from unity: 1.94%
+
+COMPARISON WITH AUTOMATED CALIBRATION
+----------------------------------------------------------------------
+Automated aspect ratio: 1.002015
+Manual aspect ratio: 1.019388
+Absolute difference: 0.017373
+Relative difference: 1.73%
+
+Agreement: EXCELLENT (< 5% difference)

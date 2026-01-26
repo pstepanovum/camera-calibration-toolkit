@@ -12,10 +12,11 @@ class CheckerboardConfig:
     """
     
     # Number of internal corners (intersections) in the checkerboard
-    PATTERN_SIZE = (11, 7)  # (width, height) - internal corners
+    # 15, 11
+    PATTERN_SIZE = (14, 10)  # (width, height) - internal corners
     
     # Physical size of each square in millimeters
-    SQUARE_SIZE = 30.0  # 30mm per square
+    SQUARE_SIZE = 25  # 10mm per square
     
     # Termination criteria for corner refinement
     CRITERIA = {

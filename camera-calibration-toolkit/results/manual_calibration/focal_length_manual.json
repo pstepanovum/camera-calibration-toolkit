@@ -1,0 +1,28 @@
+{
+  "fx_estimated": 2802.6898665680555,
+  "fy_estimated": 2910.3426279057862,
+  "aspect_ratio": 0.9630102791659293,
+  "horizontal_pixels": 1608.1007431128187,
+  "vertical_pixels": 1145.0528372088338,
+  "physical_width_mm": 175.0,
+  "physical_height_mm": 120.0,
+  "distance_mm": 305.0,
+  "measurement_points": [
+    [
+      730.0,
+      911.0
+    ],
+    [
+      2338.0,
+      929.0
+    ],
+    [
+      2352.0,
+      932.0
+    ],
+    [
+      2341.0,
+      2077.0
+    ]
+  ]
+}

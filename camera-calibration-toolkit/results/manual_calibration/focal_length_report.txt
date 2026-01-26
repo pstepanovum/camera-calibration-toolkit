@@ -1,0 +1,33 @@
+MANUAL CALIBRATION: FOCAL LENGTH ESTIMATION
+======================================================================
+
+METHOD
+----------------------------------------------------------------------
+Projection equation: f = (image_size × distance) / object_size
+Image: image_focal_length.png
+
+MEASUREMENTS
+----------------------------------------------------------------------
+Physical width: 175.0 mm
+Physical height: 120.0 mm
+Distance to camera: 305.0 mm
+Horizontal in image: 1608.10 pixels
+Vertical in image: 1145.05 pixels
+
+RESULTS
+----------------------------------------------------------------------
+fx (horizontal focal length): 2802.69 pixels
+fy (vertical focal length): 2910.34 pixels
+Aspect ratio (fx/fy): 0.963010
+
+COMPARISON WITH AUTOMATED CALIBRATION
+----------------------------------------------------------------------
+Automated fx: 2861.60 pixels
+Manual fx: 2802.69 pixels
+fx difference: 58.91 pixels (2.06%)
+
+Automated fy: 2855.84 pixels
+Manual fy: 2910.34 pixels
+fy difference: 54.50 pixels (1.91%)
+
+Agreement: EXCELLENT (< 5% difference)

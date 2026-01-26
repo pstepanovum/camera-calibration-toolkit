@@ -65,3 +65,8 @@ htmlcov/
 
 # Documentation
 docs/_build/
+data/checkerboard_images/*.png
+data/checkerboard_images/raw/*.png
+
+results/detected_corners/*.png
+results/detected_corners/raw/*.png

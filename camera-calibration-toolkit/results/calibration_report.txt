@@ -1,24 +1,24 @@
 CAMERA CALIBRATION REPORT
 ======================================================================
 
-Pattern size: 11 x 7 corners
-Square size: 30.0 mm
-Number of images: 20
-Image resolution: 1024 x 576 pixels
+Pattern size: 14 x 10 corners
+Square size: 25 mm
+Number of images: 21
+Image resolution: 3024 x 3024 pixels
 
 INTRINSIC PARAMETERS
 ----------------------------------------------------------------------
-fx: 722.059625 pixels
-fy: 732.734656 pixels
-cx: 513.695869 pixels
-cy: 292.739355 pixels
+fx: 2861.599753 pixels
+fy: 2855.844156 pixels
+cx: 1536.578312 pixels
+cy: 1499.451913 pixels
 
 DISTORTION COEFFICIENTS
 ----------------------------------------------------------------------
-k1: 0.011065
-k2: -0.136899
-p1: -0.001416
-p2: 0.001299
-k3: 0.202307
+k1: 0.061094
+k2: 0.687149
+p1: 0.002321
+p2: 0.002261
+k3: -2.843848
 
-Mean reprojection error: 0.199468 pixels
+Mean reprojection error: 2.271748 pixels

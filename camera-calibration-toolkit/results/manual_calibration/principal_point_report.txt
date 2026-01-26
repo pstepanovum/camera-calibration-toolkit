@@ -1,0 +1,42 @@
+MANUAL CALIBRATION: PRINCIPAL POINT ESTIMATION
+======================================================================
+
+METHOD
+----------------------------------------------------------------------
+Vanishing point analysis from parallel lines
+Image: principal_point_image.png
+Number of line sets: 6
+Number of vanishing points: 6
+
+VANISHING POINTS
+----------------------------------------------------------------------
+VP 1: (1200.7, 1278.5)
+VP 2: (1254.6, 1416.3)
+VP 3: (1324.9, 1446.6)
+VP 4: (1250.7, 1426.4)
+VP 5: (1645.5, 1361.7)
+VP 6: (1311.1, 1493.4)
+
+RESULTS
+----------------------------------------------------------------------
+Estimated principal point (cx, cy): (1385.5, 1436.3)
+Image center: (1512.0, 1512.0)
+
+OFFSET FROM IMAGE CENTER
+----------------------------------------------------------------------
+X offset: -126.5 pixels (-8.37%)
+Y offset: -75.7 pixels (-5.01%)
+
+Principal point has moderate offset from center (5-10%)
+
+COMPARISON WITH AUTOMATED CALIBRATION
+----------------------------------------------------------------------
+Automated cx: 1536.6 pixels
+Manual cx: 1385.5 pixels
+cx difference: 151.1 pixels (9.83%)
+
+Automated cy: 1499.5 pixels
+Manual cy: 1436.3 pixels
+cy difference: 63.2 pixels (4.21%)
+
+Agreement: GOOD (< 10% difference)
