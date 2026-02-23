@@ -24,6 +24,8 @@ Output:
 - Remapping matrices for fast image rectification
 """
 
+import re
+
 import cv2
 import numpy as np
 import glob
@@ -303,7 +305,9 @@ class StereoRectifier:
             for item in os.listdir(left_base):
                 item_path = os.path.join(left_base, item)
                 if os.path.isdir(item_path) and item.startswith('scene'):
-                    scenes_to_process.append(item)
+                    # Strip '_left' suffix to get the base scene name
+                    scene_base = item.replace('_left', '')
+                    scenes_to_process.append(scene_base)
             
             scenes_to_process.sort()
             print(f"\nAuto-detected scenes: {scenes_to_process}")
@@ -346,7 +350,8 @@ class StereoRectifier:
             # Match pairs
             for left_path in left_images:
                 left_name = os.path.basename(left_path)
-                right_name = left_name.replace('L', 'R').replace('left', 'right')
+                right_name = re.sub(r'^L(?=\d)', 'R', left_name)
+
                 
                 right_path = None
                 for rp in right_images:

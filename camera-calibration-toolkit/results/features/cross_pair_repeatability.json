@@ -1,0 +1,50 @@
+{
+  "Harris": {
+    "pair1_vs_pair7": {
+      "radius_10px": 98.9,
+      "radius_15px": 100.0,
+      "radius_20px": 100.0
+    },
+    "pair1_vs_pair13": {
+      "radius_10px": 99.1,
+      "radius_15px": 100.0,
+      "radius_20px": 100.0
+    }
+  },
+  "SIFT": {
+    "pair1_vs_pair7": {
+      "radius_10px": 52.4,
+      "radius_15px": 68.0,
+      "radius_20px": 77.6
+    },
+    "pair1_vs_pair13": {
+      "radius_10px": 41.8,
+      "radius_15px": 67.3,
+      "radius_20px": 80.5
+    }
+  },
+  "ORB": {
+    "pair1_vs_pair7": {
+      "radius_10px": 37.7,
+      "radius_15px": 58.6,
+      "radius_20px": 69.3
+    },
+    "pair1_vs_pair13": {
+      "radius_10px": 30.8,
+      "radius_15px": 50.3,
+      "radius_20px": 68.1
+    }
+  },
+  "KAZE": {
+    "pair1_vs_pair7": {
+      "radius_10px": 63.8,
+      "radius_15px": 73.7,
+      "radius_20px": 79.5
+    },
+    "pair1_vs_pair13": {
+      "radius_10px": 62.7,
+      "radius_15px": 75.2,
+      "radius_20px": 78.9
+    }
+  }
+}

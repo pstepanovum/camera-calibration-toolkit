@@ -39,7 +39,8 @@ class CalibrationConfig:
     MIN_IMAGES = 10
     
     # Image file extensions to consider
-    IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff')
+    IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.bmp', '.tiff',
+                    '.JPG', '.JPEG', '.PNG', '.BMP', '.TIFF')
 
 
 class StereoConfig:

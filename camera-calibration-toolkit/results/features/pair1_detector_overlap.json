@@ -1,0 +1,14 @@
+{
+  "Harris_vs_SIFT": 35.2,
+  "Harris_vs_ORB": 21.7,
+  "Harris_vs_KAZE": 40.1,
+  "SIFT_vs_Harris": 99.9,
+  "SIFT_vs_ORB": 53.8,
+  "SIFT_vs_KAZE": 75.8,
+  "ORB_vs_Harris": 99.9,
+  "ORB_vs_SIFT": 90.7,
+  "ORB_vs_KAZE": 93.8,
+  "KAZE_vs_Harris": 99.6,
+  "KAZE_vs_SIFT": 63.9,
+  "KAZE_vs_ORB": 56.8
+}

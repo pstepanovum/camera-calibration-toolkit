@@ -1,0 +1,446 @@
+% ============================================================================
+% INTRODUCTION
+% ============================================================================
+\section{Introduction}
+
+Feature detection is a foundational step in a wide range of computer vision
+tasks including 3-D reconstruction, stereo matching, visual localization, and
+object recognition. A feature detector identifies salient image locations —
+corners, blobs, or texture extrema — that can be reliably re-detected across
+different views of the same scene. The quality of subsequent processing
+pipelines depends critically on how many such features are found, how well
+they are balanced across stereo views, and how reproducibly they are detected
+as the camera moves.
+
+This project applies four fundamentally different detectors to calibrated
+rectified stereo image pairs of a laboratory scene: Harris \cite{harris1988},
+SIFT \cite{lowe2004}, ORB \cite{rublee2011}, and KAZE \cite{alcantarilla2012}.
+The images were first calibrated using a checkerboard pattern to obtain
+intrinsic parameters and the stereo geometry $(R, T)$, then rectified so that
+corresponding points are guaranteed to lie on the same horizontal scanline.
+This epipolar constraint is exploited throughout the correspondence analysis.
+
+Three stereo pairs (Pairs 1, 7, and 13) were selected from the available
+dataset to represent different scene positions. All four detectors are applied
+to both the left and right images of each pair. Results are post-processed
+with non-maximum suppression (NMS), evaluated quantitatively, and compared
+against published repeatability benchmarks.
+
+% ============================================================================
+% BACKGROUND
+% ============================================================================
+\section{Background and Related Work}
+
+\subsection{Harris Corner Detector}
+
+Harris and Stephens \cite{harris1988} define a corner as a point where image
+intensity changes strongly in all directions. Given image gradients $I_x$ and
+$I_y$, the structure tensor $\mb{M}$ is computed over a local window:
+\begin{equation}
+    \mb{M} = \begin{bmatrix}
+        \sum I_x^2 & \sum I_x I_y \\
+        \sum I_x I_y & \sum I_y^2
+    \end{bmatrix}
+\end{equation}
+The cornerness response is:
+\begin{equation}
+    R = \det(\mb{M}) - k \cdot \mathrm{tr}(\mb{M})^2
+\end{equation}
+where $k \approx 0.04$. $R > 0$ indicates a corner, $R < 0$ an edge, and
+$R \approx 0$ a flat region. Harris is not scale-invariant but is highly
+sensitive and produces a dense response map.
+
+\subsection{SIFT}
+
+Scale-Invariant Feature Transform (SIFT) \cite{lowe2004} detects local
+extrema in a Difference-of-Gaussians (DoG) pyramid constructed across
+multiple scales $\sigma$:
+\begin{equation}
+    D(x, y, \sigma) = G(x, y, k\sigma) * I - G(x, y, \sigma) * I
+\end{equation}
+Points that are extrema in both position and scale are retained after
+discarding low-contrast responses (contrast threshold) and edge responses
+(ratio of principal curvatures). The detector is invariant to scale and
+rotation.
+
+\subsection{ORB}
+
+Oriented FAST and Rotated BRIEF (ORB) \cite{rublee2011} combines the FAST
+corner detector with an orientation assignment based on the intensity centroid
+of the local patch. FAST tests a ring of 16 pixels around a candidate point:
+if $N$ consecutive pixels are all brighter or all darker than the center
+by a threshold $t$, a corner is declared. Orientation is assigned as:
+\begin{equation}
+    \theta = \mathrm{atan2}\!\left(\sum_{p \in P} y \cdot I(p),\;
+    \sum_{p \in P} x \cdot I(p)\right)
+\end{equation}
+ORB is computationally efficient and patent-free, designed as a fast
+alternative to SIFT and SURF.
+
+\subsection{KAZE}
+
+KAZE \cite{alcantarilla2012} constructs its scale space through nonlinear
+diffusion rather than Gaussian blurring. The diffusion equation:
+\begin{equation}
+    \frac{\partial L}{\partial t} = \nabla \cdot \left(c(\mb{x},t)\,\nabla L\right)
+\end{equation}
+uses a conductivity function $c(\mb{x},t)$ derived from the image gradient
+magnitude. Near edges, $c \to 0$, halting diffusion; in flat regions,
+$c \to 1$, allowing smoothing to proceed. This preserves object boundaries
+better than Gaussian blurring, producing features that are more precisely
+localised at edges and more stable under viewpoint change.
+
+\subsection{Non-Maximum Suppression}
+
+NMS enforces a minimum spacing $D$ between retained features. The exhaustive
+pairwise algorithm is $O(n^2)$, which is intractable for Harris with
+$n > 10^6$ responses. We implement a fast grid-based NMS that partitions
+the image into $D \times D$ cells, retaining only the highest-response
+keypoint per cell. This reduces complexity to $O(n \log n)$ for sorting
+plus $O(n)$ for grid assignment, making it practical for any detector.
+
+% ============================================================================
+% EXPERIMENTAL SETUP
+% ============================================================================
+\section{Experimental Setup}
+
+\subsection{Stereo Calibration and Rectification}
+
+Prior to feature detection, the stereo camera system was calibrated using
+15 paired checkerboard images (14 successful pairs after one detection
+failure). Calibration was performed with \texttt{cv2.stereoCalibrate},
+yielding a reprojection error of 1.147 pixels, a baseline of 255.51 mm,
+and rotation angles of $(R_x, R_y, R_z) = (-0.52°, -0.92°, -0.67°)$
+between cameras. Rectification was computed with $\alpha = 0.8$
+(\texttt{cv2.stereoRectify}), producing horizontal epipolar lines and
+ensuring that corresponding points share the same image row.
+
+\subsection{Image Pairs and Resolution}
+
+Three stereo pairs were selected: Pair 1 (close frontal view), Pair 7
+(intermediate distance), and Pair 13 (wider angle). All images are
+$1280 \times 960$ pixels (1.2 megapixels), processed in grayscale.
+
+\subsection{Detector Parameters}
+
+Parameters were tuned away from defaults to maximize strong feature
+coverage. Table~\ref{tab:params} summarizes the key settings.
+
+\begin{table}[h]
+\centering
+\caption{Detector Parameter Settings}
+\label{tab:params}
+\begin{tabular}{lll}
+\toprule
+\textbf{Detector} & \textbf{Parameter} & \textbf{Value (Default)} \\
+\midrule
+Harris & Threshold fraction & 0.10 (N/A) \\
+       & Block size / $k$   & 2, 0.04 \\
+\midrule
+SIFT   & Contrast threshold  & 0.02 (0.04) \\
+       & Edge threshold      & 15 (10) \\
+\midrule
+ORB    & FAST threshold      & 7 (20) \\
+       & Max features        & 8000 (500) \\
+\midrule
+KAZE   & Detector threshold  & 0.0003 (0.001) \\
+       & Octaves             & 4 (4) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+NMS was applied at $D \in \{10, 20\}$ pixels. All analysis reported
+in Section~\ref{sec:results} uses $D = 10$ unless stated otherwise.
+
+% ============================================================================
+% RESULTS
+% ============================================================================
+\section{Results and Analysis}
+\label{sec:results}
+
+\subsection{Feature Count and Stereo Balance}
+
+Table~\ref{tab:counts} reports raw and post-NMS feature counts and
+stereo correspondence rates for all detectors across all three pairs.
+
+\begin{table}[h]
+\centering
+\caption{Feature Counts and Stereo Correspondence ($D = 10$)}
+\label{tab:counts}
+\begin{tabular}{llrrrr}
+\toprule
+\textbf{Pair} & \textbf{Det.} & \textbf{NMS-L} & \textbf{NMS-R}
+              & \textbf{Corr} & \textbf{Corr\%} \\
+\midrule
+1  & Harris & 12288 & 12288 & 11493 & 93.5 \\
+   & SIFT   &  1964 &  2401 &   855 & 43.5 \\
+   & ORB    &  1579 &  1540 &   431 & 27.3 \\
+   & KAZE   &  2783 &  3053 &  1439 & 51.7 \\
+\midrule
+7  & Harris & 12288 & 12288 & 11595 & 94.4 \\
+   & SIFT   &  2923 &  3134 &  1662 & 56.9 \\
+   & ORB    &  1652 &  1674 &   516 & 31.2 \\
+   & KAZE   &  2855 &  3097 &  1373 & 48.1 \\
+\midrule
+13 & Harris & 12288 & 12288 & 11307 & 92.0 \\
+   & SIFT   &  2288 &  2138 &   929 & 40.6 \\
+   & ORB    &  1428 &  1476 &   436 & 30.5 \\
+   & KAZE   &  2772 &  2803 &  1481 & 53.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Harris consistently fills every NMS grid cell (12,288 = $128 \times 96$),
+indicating that its threshold is not selective enough to distinguish strong
+from weak corners — the detector responds to nearly every textured pixel.
+This inflates the correspondence rate to 92--94\%, since matching candidates
+are virtually everywhere in the image.
+
+KAZE achieves the best balance among the selective detectors: approximately
+2,800 features per image with left-right counts within 10\%, and an average
+correspondence rate of 51\%. SIFT is similar in feature count (1,964--2,923)
+with correspondence averaging 47\%. ORB produces the fewest useful features
+after NMS (1,428--1,652) and the lowest correspondence (27--31\%).
+
+Figure~\ref{fig:harris_strip} illustrates the effect of varying $D$ on
+feature count. Doubling $D$ from 10 to 20 reduces features by approximately
+$4\times$ (as expected for a 2D grid where cell area quadruples), confirming
+the geometric relationship between suppression radius and retained count.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{images/pair1_SIFT_strip.jpg}
+    \caption{Pair 1 — SIFT keypoints on rectified left (green) and right
+    (orange) images with horizontal epipolar lines. Corresponding features
+    lie on the same scanline, confirming successful rectification.}
+    \label{fig:sift_strip}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{images/pair1_KAZE_strip.jpg}
+    \caption{Pair 1 — KAZE keypoints on rectified stereo pair. KAZE produces
+    well-distributed features with strong localisation at object boundaries.}
+    \label{fig:kaze_strip}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{images/pair1_ALL_detectors.jpg}
+    \caption{Pair 1 left image with all four detectors overlaid:
+    Harris (green), SIFT (orange), ORB (pink), KAZE (cyan).
+    Harris covers the image uniformly; the three selective detectors
+    cluster at high-gradient object boundaries.}
+    \label{fig:all_detectors}
+\end{figure}
+
+\subsection{Inter-Detector Overlap}
+
+Table~\ref{tab:overlap} reports the percentage of keypoints from detector A
+that have a spatial match within 10 pixels in detector B's output, for Pair 1.
+Results for Pairs 7 and 13 are consistent.
+
+\begin{table}[h]
+\centering
+\caption{Detector Overlap on Pair 1 (radius = 10 px). Entry $(A \to B)$
+is the \% of A's keypoints found within 10 px of a B keypoint.}
+\label{tab:overlap}
+\begin{tabular}{lcccc}
+\toprule
+ & \textbf{Harris} & \textbf{SIFT} & \textbf{ORB} & \textbf{KAZE} \\
+\midrule
+Harris & ---   & 35.2 & 21.7 & 40.1 \\
+SIFT   & 99.9  & ---  & 53.8 & 75.8 \\
+ORB    & 99.9  & 90.7 & ---  & 93.8 \\
+KAZE   & 99.6  & 63.9 & 56.8 & ---  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The asymmetry is the most informative result. SIFT $\to$ Harris, ORB $\to$
+Harris, and KAZE $\to$ Harris are all $\approx 99\%$: virtually every
+feature found by the selective detectors is also found by Harris, confirming
+Harris as a superset detector. Conversely, Harris $\to$ SIFT is only
+35--45\%: Harris detects roughly 2--3$\times$ more locations than SIFT
+considers strong enough to retain, meaning the extra Harris features are
+mostly weak or repeated texture responses that would hamper matching.
+
+SIFT $\to$ KAZE overlap of 75.8\% and KAZE $\to$ SIFT of 63.9\% indicate
+substantial but not complete agreement between these two methods. They share
+a common set of highly salient scene features while each finding additional
+locations the other rejects.
+
+\subsection{Effect of NMS Radius}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{images/pair7_Harris_strip.jpg}
+    \caption{Pair 7 — Harris response after NMS at $D = 10$. The
+    uniform spatial distribution is a consequence of grid-based NMS
+    filling every $10\times10$ pixel cell.}
+    \label{fig:harris_strip}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{images/pair7_ORB_strip.jpg}
+    \caption{Pair 7 — ORB keypoints. ORB tends to cluster features at
+    high-contrast edges and avoids smooth regions, resulting in uneven
+    spatial distribution and lower stereo correspondence.}
+    \label{fig:orb_strip}
+\end{figure}
+
+Increasing $D$ from 10 to 20 reduces post-NMS counts by approximately
+$4\times$ for Harris (12,288 $\to$ 3,072) and $2\times$ for selective
+detectors (e.g., SIFT: 1,964 $\to$ 1,207 on Pair 1). The difference arises
+because Harris fills every cell regardless of $D$, whereas selective detectors
+leave many cells empty at $D = 10$ already. For a $1280 \times 960$ image,
+$D = 10$ corresponds to cells covering $0.78\%$ of the image width, which
+is consistent with the recommendation to scale $D$ with resolution
+\cite{mikolajczyk2005}.
+
+% ============================================================================
+% CREATIVE COMPONENT
+% ============================================================================
+\section{Creative Component: Cross-Pair Repeatability}
+
+\subsection{Motivation and Definition}
+
+Repeatability, as defined by Mikolajczyk and Schmid \cite{mikolajczyk2005},
+measures how consistently a detector fires on the same physical scene
+points across different viewpoints. Formally, given a reference set of
+keypoints $\mathcal{K}_{\text{ref}}$ from view 1 and a set
+$\mathcal{K}_{\text{other}}$ from view 2:
+\begin{equation}
+    \rho(r) = \frac{\bigl|\{p \in \mathcal{K}_{\text{ref}} :
+    \exists\, q \in \mathcal{K}_{\text{other}},\;
+    \|p - q\|_2 < r\}\bigr|}{|\mathcal{K}_{\text{ref}}|} \times 100\%
+\end{equation}
+where $r$ is a spatial tolerance in pixels. This is a purely geometric
+measure — no descriptor matching is performed — isolating the localization
+stability of the detector itself.
+
+\subsection{Experimental Protocol}
+
+Pair 1 was used as the reference. Repeatability was computed against Pairs 7
+and 13 at three radii $r \in \{10, 15, 20\}$ pixels. Harris was excluded
+from meaningful comparison because its grid saturation produces non-selective
+keypoints at every cell regardless of scene content.
+
+\subsection{Results}
+
+\begin{table}[h]
+\centering
+\caption{Cross-Pair Repeatability (\%). Pair 1 as reference.
+Harris omitted due to grid saturation artifact.}
+\label{tab:repeat}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Pair 1 $\to$ Pair 7}}
+ & \multicolumn{3}{c}{\textbf{Pair 1 $\to$ Pair 13}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+\textbf{Det.} & $r$=10 & $r$=15 & $r$=20
+              & $r$=10 & $r$=15 & $r$=20 \\
+\midrule
+SIFT & 52.4 & 68.0 & 77.6 & 41.8 & 67.3 & 80.5 \\
+ORB  & 37.7 & 58.6 & 69.3 & 30.8 & 50.3 & 68.1 \\
+KAZE & 63.8 & 73.7 & 79.5 & 62.7 & 75.2 & 78.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Discussion}
+
+KAZE achieves the highest repeatability at all radii and across both pair
+comparisons, reaching 73--75\% at $r = 15$ pixels. This is consistent with
+the nonlinear diffusion design: because diffusion halts at image edges, KAZE
+features are anchored to stable physical boundaries (corners of objects,
+shelf edges) rather than texture patches that vary with illumination or
+viewpoint.
+
+SIFT achieves 67--68\% at $r = 15$ px, which closely matches the 60--70\%
+range reported by Mikolajczyk and Schmid \cite{mikolajczyk2005} on their
+standard viewpoint-change benchmark (bark, wall, and bikes sequences).
+This agreement suggests our lab scene provides a comparable level of
+viewpoint challenge to the published benchmark.
+
+ORB achieves 50--59\% at $r = 15$ px, notably lower than SIFT and KAZE.
+While ORB's FAST detector is highly reproducible under pure translation,
+its sensitivity to in-plane rotation and scale change (despite the
+orientation assignment) reduces repeatability when the camera position
+changes substantially.
+
+Figure~\ref{fig:repeatability} visualizes how repeatability grows with
+radius for all three detectors on both pair comparisons. The curve shape
+— steep growth from 10 to 15 px then flattening toward 20 px — indicates
+that most repeatable features reappear within 15 pixels of their reference
+location, suggesting that sub-15 px localization precision is achievable
+for all methods.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\columnwidth]{images/pair13_KAZE_strip.jpg}
+    \caption{Pair 13 — KAZE keypoints illustrating strong edge-anchored
+    feature localisation that contributes to high cross-pair repeatability.}
+    \label{fig:repeatability}
+\end{figure}
+
+% ============================================================================
+% DISCUSSION
+% ============================================================================
+\section{Discussion}
+
+\subsection{Suitability for Stereo Matching}
+
+The results suggest a clear ranking for the next project (feature matching
+and 3-D reconstruction): KAZE $>$ SIFT $>$ ORB, with Harris unsuitable
+in its current form. KAZE's combination of high feature count, 51\%
+stereo correspondence, and 73--75\% cross-pair repeatability makes it
+the strongest candidate for producing reliable stereo matches. SIFT
+provides slightly fewer features but achieves comparable repeatability
+and substantially better theoretical matching properties (real-valued
+descriptors vs. binary). ORB's 27--31\% stereo correspondence is a
+significant weakness — roughly two thirds of ORB features in the left
+image have no candidate in the right image, which would result in many
+failed matches.
+
+\subsection{Harris as a Baseline}
+
+Harris is useful as a baseline to confirm that the NMS implementation
+is working correctly (uniform coverage at $D = 10$) and to establish an
+upper bound on feature density. Its 92--94\% stereo correspondence confirms
+that the rectification is accurate: the images are well-aligned horizontally,
+and the low $y$-tolerance criterion ($\leq 3$ pixels) is satisfied for nearly
+all candidate pairs. However, Harris should be combined with a strong
+descriptor and aggressive NMS before use in matching.
+
+\subsection{Left-Right Balance}
+
+Assignment requirements specify roughly equal feature counts in left and
+right views. For Harris the counts are identical by construction (same image
+resolution, same NMS grid). For SIFT and KAZE, left and right counts differ
+by 10--22\%, attributed to viewpoint-dependent texture visibility —
+features behind objects are visible from one camera but occluded in the
+other. ORB is most balanced (within 5--10\%) due to its binary threshold
+and scale pyramid design.
+
+% ============================================================================
+% CONCLUSION
+% ============================================================================
+\section{Conclusion}
+
+This paper evaluated Harris, SIFT, ORB, and KAZE detectors on calibrated
+rectified stereo images under five quantitative criteria. KAZE emerged as
+the best-performing selective detector, combining the highest feature yield
+among quality detectors (${\sim}2{,}800$ post-NMS), the best stereo
+correspondence (51\%), and the highest cross-pair repeatability (73--75\%
+at 15 px), attributable to its nonlinear diffusion scale space that anchors
+features to stable object boundaries. SIFT achieved comparable repeatability
+(67--68\%) consistent with published benchmarks \cite{mikolajczyk2005}.
+ORB, while computationally fastest, produced the lowest correspondence and
+repeatability, limiting its utility for dense stereo reconstruction. Harris
+confirmed accurate rectification geometry through near-perfect correspondence
+rates but is too non-selective for quality matching without further filtering.
+These results provide a principled basis for selecting detectors and
+suppression parameters in the subsequent feature matching and 3-D
+reconstruction project.

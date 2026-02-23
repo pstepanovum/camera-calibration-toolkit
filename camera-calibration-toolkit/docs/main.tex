@@ -1,0 +1,113 @@
+\documentclass[conference]{IEEEtran}
+% ============================================================================
+% PACKAGE IMPORTS
+% ============================================================================
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{enumitem}
+\setlist[itemize]{
+    label=--,
+    leftmargin=2.5em,
+    itemsep=1pt,
+    parsep=0pt,
+    topsep=2pt
+}
+\setlist[enumerate]{
+    leftmargin=*,
+    itemsep=1pt,
+    parsep=0pt,
+    topsep=2pt
+}
+\usepackage{balance}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Feature Detection in Calibrated Stereo Images},
+    pdfauthor={Pavel Stepanov}
+}
+\setlength{\parindent}{0pt}
+% ============================================================================
+% CUSTOM COMMANDS
+% ============================================================================
+\newcommand{\mb}[1]{\mathbf{#1}}
+\newcommand{\mc}[1]{\mathcal{#1}}
+\newcommand{\R}{\mathbb{R}}
+% ============================================================================
+% SECTION FORMATTING
+% ============================================================================
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+% ============================================================================
+% DOCUMENT METADATA
+% ============================================================================
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\pagestyle{plain}
+% ============================================================================
+% BEGIN DOCUMENT
+% ============================================================================
+\begin{document}
+% ============================================================================
+% TITLE AND AUTHORS
+% ============================================================================
+\title{Feature Detection in Calibrated Rectified Stereo Images:
+A Comparative Study of Harris, SIFT, ORB, and KAZE\\
+{\normalsize \textit{ECE 738 - Computer Vision, Spring 2026}}}
+\author{
+    \IEEEauthorblockN{Pavel Stepanov}
+    \IEEEauthorblockA{
+        \textit{Department of Electrical and Computer Engineering}\\
+        \textit{University of Miami}\\
+        Coral Gables, Florida, USA\\
+        pas273@miami.edu
+    }
+}
+\maketitle
+\thispagestyle{plain}
+% ============================================================================
+% ABSTRACT
+% ============================================================================
+\begin{abstract}
+This paper presents a comparative study of four feature detectors —
+Harris, SIFT, ORB, and KAZE — applied to calibrated rectified stereo image
+pairs of a laboratory scene. Detectors are evaluated on three stereo pairs
+across five criteria: raw feature yield, post-NMS feature count, left-right
+stereo correspondence rate, inter-detector overlap, and cross-pair
+repeatability. Non-maximum suppression (NMS) is implemented using a fast
+grid-based algorithm with suppression radius $D \in \{10, 20\}$ pixels.
+Results show that Harris produces the largest number of features (12,288
+per image at $D=10$) but saturates the NMS grid, reflecting its
+non-selective nature. KAZE achieves the best balance of feature density
+(${\sim}2{,}800$ after NMS) and stereo correspondence (${\sim}51\%$), while
+also attaining the highest cross-pair repeatability (73--75\% at 15 px
+radius), consistent with its nonlinear diffusion scale-space design. SIFT
+reaches 67--68\% repeatability, matching published benchmark values from
+Mikolajczyk and Schmid. ORB provides the fastest detection but the lowest
+stereo correspondence (27--31\%) and repeatability (50--59\%). Detector
+overlap analysis reveals that SIFT, ORB, and KAZE are near-perfect subsets
+of Harris, while SIFT and KAZE show 62--82\% mutual agreement, confirming
+they detect qualitatively similar, physically meaningful features.
+\end{abstract}
+% ============================================================================
+% MAIN CONTENT
+% ============================================================================
+\input{content.tex}
+% ============================================================================
+% REFERENCES
+% ============================================================================
+\newpage
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\balance
+\end{document}

@@ -1,0 +1,36 @@
+STEREO CAMERA CALIBRATION REPORT
+======================================================================
+
+Pattern size: 14 x 10 corners
+Square size: 25 mm
+Number of image pairs: 14
+Image resolution: 1280 x 960 pixels
+
+LEFT CAMERA INTRINSICS
+----------------------------------------------------------------------
+fx: 1356.442987 pixels
+fy: 1361.537999 pixels
+cx: 609.033247 pixels
+cy: 506.045818 pixels
+
+RIGHT CAMERA INTRINSICS
+----------------------------------------------------------------------
+fx: 1354.769239 pixels
+fy: 1356.931155 pixels
+cx: 635.631858 pixels
+cy: 460.800942 pixels
+
+STEREO GEOMETRY
+----------------------------------------------------------------------
+Baseline: 255.507997 mm
+Translation vector T:
+  Tx: -255.472961 mm
+  Ty: 3.105939 mm
+  Tz: -2.873280 mm
+
+Rotation angles:
+  Rx: -0.519236 degrees
+  Ry: -0.923750 degrees
+  Rz: -0.674639 degrees
+
+Mean reprojection error: 1.147282 pixels

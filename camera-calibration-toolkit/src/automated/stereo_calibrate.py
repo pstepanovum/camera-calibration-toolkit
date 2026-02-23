@@ -19,6 +19,8 @@ Output:
 - Refined camera matrices and distortion coefficients
 """
 
+import re
+
 import cv2
 import numpy as np
 import glob
@@ -107,17 +109,21 @@ class StereoCalibrator:
         left_basenames = [os.path.basename(p) for p in left_images]
         right_basenames = [os.path.basename(p) for p in right_images]
         
-        # Simple matching: assume imageL01.jpg matches imageR01.jpg
-        # Extract the number from filename
         for left_path, left_name in zip(left_images, left_basenames):
-            # Try to find corresponding right image
-            # Replace 'L' or 'left' with 'R' or 'right'
-            right_name = left_name.replace('L', 'R').replace('left', 'right')
+            name_no_ext, ext = os.path.splitext(left_name)
             
-            if right_name in right_basenames:
-                right_path = right_images[right_basenames.index(right_name)]
-                self.left_image_paths.append(left_path)
-                self.right_image_paths.append(right_path)
+            # Replace leading 'L' or 'left' (case-insensitive) before the number
+            right_stem = re.sub(r'^L(?=\d)', 'R', name_no_ext)
+            right_stem = re.sub(r'^[Ll]eft', 'right', right_stem)
+            
+            # Try both same-case and original extension
+            for candidate_ext in [ext, ext.lower(), ext.upper()]:
+                right_name = right_stem + candidate_ext
+                if right_name in right_basenames:
+                    right_path = right_images[right_basenames.index(right_name)]
+                    self.left_image_paths.append(left_path)
+                    self.right_image_paths.append(right_path)
+                    break
             else:
                 print(f"  WARNING: No matching right image for {left_name}")
         
